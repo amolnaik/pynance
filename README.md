@@ -23,7 +23,7 @@ This is a lightweight streamlit app for understanding financial terms, fundament
 Select a symbol name of the company you want to assess. If the symbol does not match any name, then the selectbox will display search results matching the symbol. Select the company and press start. The app will display fundamental terms and display performance from historical financial statements.
 
 ### Built With
-* [Streamlit](https://streamlit.io/)
+[Streamlit](https://streamlit.io/)
 
 <!-- GETTING STARTED -->
 
