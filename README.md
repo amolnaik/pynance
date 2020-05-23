@@ -11,7 +11,6 @@
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [License](#license)
-* [Contact](#contact)
 * [Acknowledgements](#acknowledgements)
 
 
@@ -32,26 +31,22 @@ Python3
 
 ### Installation
 1. Get a free API Key at [https://fmpcloud.com](https://fmpcloud.io/)
-2. Install streamlit
-```sh
-pip install streamlit
-```
-3. Install dependencies
+2. Install dependencies
 ```sh
 pip install -r requirements.txt
 ```
-4. Run
-
+3. Run
+```sh
+streamlit run fundamentals_app.py
+```
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-
+Coming soon
 
 <!-- ROADMAP -->
 ## Roadmap
 Coming soon
-
-
 
 <!-- CONTRIBUTING -->
 ## Contributing
