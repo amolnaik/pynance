@@ -16,10 +16,11 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
+This is a lightweight streamlit app for understanding financial terms, fundamental ratios, and performance metrics. It uses fmpcloud to pull periodic data stock prices, annual statements, balance sheets of listed companies in the US.The explanation of the terms used in the app is taken from Investopedia.
 
 ![Product Name Screen Shot][product-screenshot]
 
-There are many great README templates available on GitHub, however, I didn't find one that really suit my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need.
+Select a symbol name of the company you want to assess. If the symbol does not match any name, then the selectbox will display search results matching the symbol. Select the company and press start. The app will display fundamental terms and display performance from historical financial statements.
 
 ### Built With
 * [Streamlit](https://streamlit.io/)
