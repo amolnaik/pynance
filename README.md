@@ -16,7 +16,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-This is a lightweight streamlit app for understanding financial terms, fundamental ratios, and performance metrics. It uses fmpcloud to pull periodic data stock prices, annual statements, balance sheets of listed companies in the US.The explanation of the terms used in the app is taken from Investopedia.
+This is a lightweight streamlit app for understanding financial terms, fundamental ratios, and performance metrics. It uses fmpcloud to pull periodic data of stock prices, annual statements, balance sheets of listed companies in the US. The explanation of the terms used in the app is taken from Investopedia.
 
 ![Product Name Screen Shot][product-screenshot]
 

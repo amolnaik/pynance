@@ -3,11 +3,14 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta
 import numpy as np
+import pandas as pd
 import matplotlib.dates as mdates
+from matplotlib.ticker import MaxNLocator
 
-from pyfmpcloud import settings
-from pyfmpcloud import company_valuation as cv
-from pyfmpcloud import stock_time_series as sts
+
+from app_utility import settings
+from app_utility import company_valuation as cv
+from app_utility import stock_time_series as sts
 
 from matplotlib.font_manager import FontProperties
 fontP = FontProperties()
@@ -18,35 +21,49 @@ todaystr = today.strftime("%Y-%m-%d")
 ten_years_ago = datetime.today() - timedelta(days=10*365)
 ten_years_ago_str = ten_years_ago.strftime("%Y-%m-%d")
 
+years = mdates.YearLocator()   # every year
+months = mdates.MonthLocator()  # every month
+years_fmt = mdates.DateFormatter('%Y')
+
 
 st.title('Fundamentals')
 
 st.sidebar.title("Setup")
-api_key = st.sidebar.text_input('FMPCLOUD Key', 'fb64cefc71056ea820f4572da33df319')
+api_key = st.sidebar.text_input('FMPCLOUD Key', 'fb64cefc71056ea820f4572da33df319', type="password")
 settings.set_apikey(api_key)
 
 symbol_search = st.sidebar.text_input('Symbol', '')
-df_ticker = sts.ticker_search(match = symbol_search, limit = 10)
+#df_ticker = sts.ticker_search(match = symbol_search)
 
-selected = st.sidebar.selectbox('symbols found', list(df_ticker.name.values))
+#scroll_list = list(df_ticker.name.values)
+#scroll_list.append(symbol_search)
+
+#selected = st.sidebar.selectbox('symbols found', scroll_list)
 
 if st.sidebar.button("Start"):
-    st.write('showing results for:', selected)
-    symbol = df_ticker.loc[df_ticker['name'] == selected,'symbol'][0]
 
-    # get historical prices
-    df_prices_ = sts.historical_stock_data(symbol, dailytype = 'line', start = ten_years_ago_str, end =todaystr)
-    df_prices = df_prices_.reset_index()
-    # get financial ratios
-    df_ratios = cv.financial_ratios(ticker=symbol,period='annual',ttm = False)
-    # get performance metrics
-    df_metrics = cv.key_metrics(ticker =symbol, period = 'annual')
-    # get income statement
-    df_income = cv.income_statement(ticker = symbol, period = 'annual', ftype = 'full')
-    # get cashflow statement
-    df_cashflow = cv.cash_flow_statement(ticker = symbol, period = 'annual', ftype = 'full')
-    # get discounted cash_flow_statement
-    df_dcf = cv.dcf(ticker = symbol, history = 'annual')
+    try:
+        symbol = symbol_search
+        #df_ticker.loc[df_ticker['name'] == selected,'symbol'][0]
+
+        st.write('showing results for:', symbol)
+
+        # get historical prices
+        df_prices_ = sts.historical_stock_data(symbol, dailytype = 'line', start = ten_years_ago_str, end =todaystr)
+        df_prices = df_prices_.reset_index()
+        # get financial ratios
+        df_ratios = cv.financial_ratios(ticker=symbol,period='annual',ttm = False)
+        # get performance metrics
+        df_metrics = cv.key_metrics(ticker =symbol, period = 'annual')
+        # get income statement
+        df_income = cv.income_statement(ticker = symbol, period = 'annual', ftype = 'full')
+        # get cashflow statement
+        df_cashflow = cv.cash_flow_statement(ticker = symbol, period = 'annual', ftype = 'full')
+        # get discounted cash_flow_statement
+        df_dcf = cv.dcf(ticker = symbol, history = 'annual')
+
+    except:
+        st.write("Stock data unavailable!")
 
 
 st.header('Quote')
@@ -56,13 +73,9 @@ try:
     fig, ax = plt.subplots()
     ax.plot(list(df_prices.date.values), list(df_prices.close.values))
 
-    years = mdates.YearLocator()   # every year
-    months = mdates.MonthLocator()  # every month
-    years_fmt = mdates.DateFormatter('%Y')
-
     ax.xaxis.set_major_locator(years)
     ax.xaxis.set_major_formatter(years_fmt)
-    st.pyplot()
+    st.pyplot(fig)
 except:
     st.write("Prices data unavailable!")
 
@@ -82,55 +95,71 @@ try:
     st.write("The price-to-earnings ratio (P/E ratio) is the ratio for valuing a company that measures its current share price relative to its per-share earnings (EPS). The price-to-earnings ratio is also sometimes known as the price multiple or the earnings multiple.")
     st.markdown(str(round(df_ratios.loc[0,'priceEarningsRatio'],2)))
 
-    plt.plot(list(df_ratios.date.values), list(df_ratios.priceToBookRatio.values), marker='o', label='P/B')
-    plt.plot(list(df_ratios.date.values), list(df_ratios.priceToSalesRatio.values), marker='o', label='P/S')
-    plt.plot(list(df_ratios.date.values), list(df_ratios.priceEarningsRatio.values), marker='o', label='P/E')
+    df_ratios['date'] = pd.to_datetime(df_ratios.date)
+
+    fig, ax = plt.subplots()
+    plt.plot(list(df_ratios.date.dt.year), list(df_ratios.priceToBookRatio.values), marker='o', label='P/B')
+    plt.plot(list(df_ratios.date.dt.year), list(df_ratios.priceToSalesRatio.values), marker='o', label='P/S')
+    plt.plot(list(df_ratios.date.dt.year), list(df_ratios.priceEarningsRatio.values), marker='o', label='P/E')
+
+    #ax.xaxis.set_major_locator(years)
+    #ax.xaxis.set_major_formatter(years_fmt)
     plt.legend(loc='upper left')
-    st.pyplot()
+    st.pyplot(fig)
+
 except:
     st.write("Fundamental Ratios data unavailable!")
 
 #------------------------------------------------------------------------------#
+
 st.header('Profitability Ratios')
 
-try:
-    st.markdown("**Gross Margin**")
-    st.write("It is a company's net sales revenue minus its cost of goods sold (COGS). In other words, it is the sales revenue a company retains after incurring the direct costs associated with producing the goods it sells, and the services it provides.")
-    st.markdown(str(round(df_ratios.loc[0,'grossProfitMargin']*100,2))+"%")
+#try:
+st.markdown("**Gross Margin**")
+st.write("It is a company's net sales revenue minus its cost of goods sold (COGS). In other words, it is the sales revenue a company retains after incurring the direct costs associated with producing the goods it sells, and the services it provides.")
+st.markdown(str(round(df_ratios.loc[0,'grossProfitMargin']*100,2))+"%")
 
-    st.markdown("**Operating Margin**")
-    st.write("It measures how much profit a company makes on a dollar of sales, after paying for variable costs of production, such as wages and raw materials, but before paying interest or tax. It is calculated by dividing a company’s operating profit by its net sales.")
-    st.markdown(str(round(df_ratios.loc[0,'operatingProfitMargin']*100,2))+"%")
+st.markdown("**Operating Margin**")
+st.write("It measures how much profit a company makes on a dollar of sales, after paying for variable costs of production, such as wages and raw materials, but before paying interest or tax. It is calculated by dividing a company’s operating profit by its net sales.")
+st.markdown(str(round(df_ratios.loc[0,'operatingProfitMargin']*100,2))+"%")
 
-    st.markdown("**Net Margin**")
-    st.write("It is equal to how much net income or profit is generated as a percentage of revenue. Net profit margin is the ratio of net profits to revenues for a company or business segment. Net profit margin is typically expressed as a percentage but can also be represented in decimal form. The net profit margin illustrates how much of each dollar in revenue collected by a company translates into profit.")
-    st.markdown(str(round(df_ratios.loc[0,'netProfitMargin']*100,2))+"%")
+st.markdown("**Net Margin**")
+st.write("It is equal to how much net income or profit is generated as a percentage of revenue. Net profit margin is the ratio of net profits to revenues for a company or business segment. Net profit margin is typically expressed as a percentage but can also be represented in decimal form. The net profit margin illustrates how much of each dollar in revenue collected by a company translates into profit.")
+st.markdown(str(round(df_ratios.loc[0,'netProfitMargin']*100,2))+"%")
 
-    plt.plot(list(df_ratios.date.values), list(df_ratios.grossProfitMargin.values), marker='o', label='Gross')
-    plt.plot(list(df_ratios.date.values), list(df_ratios.operatingProfitMargin.values), marker='o', label='Operating')
-    plt.plot(list(df_ratios.date.values), list(df_ratios.netProfitMargin.values), marker='o', label='Net')
-    plt.legend(loc='upper left')
-    st.pyplot()
+fig, ax = plt.subplots()
+plt.plot(list(df_ratios.date.values), list(df_ratios.grossProfitMargin.values), marker='o', label='Gross')
+plt.plot(list(df_ratios.date.values), list(df_ratios.operatingProfitMargin.values), marker='o', label='Operating')
+plt.plot(list(df_ratios.date.values), list(df_ratios.netProfitMargin.values), marker='o', label='Net')
+ax.xaxis.set_major_locator(years)
+ax.xaxis.set_major_formatter(years_fmt)
+plt.legend(loc='upper left')
+st.pyplot(fig)
 
-    st.markdown("**Return on Assets**")
-    st.write("It is an indicator of how profitable a company is relative to its total assets. ROA is calculated by dividing a company’s net income by total assets.")
-    st.markdown(round(df_ratios.loc[0,'returnOnAssets']*100,2))
+st.markdown("**Return on Assets**")
+st.write("It is an indicator of how profitable a company is relative to its total assets. ROA is calculated by dividing a company’s net income by total assets.")
+st.markdown(round(df_ratios.loc[0,'returnOnAssets']*100,2))
 
-    st.markdown("**Return on Equity**")
-    st.write("It is a measure of financial performance calculated by dividing net income by shareholders' equity. Because shareholders' equity is equal to a company’s assets minus its debt, ROE is considered the return on net assets.")
-    st.markdown(round(df_ratios.loc[0,'returnOnEquity']*100,2))
+st.markdown("**Return on Equity**")
+st.write("It is a measure of financial performance calculated by dividing net income by shareholders' equity. Because shareholders' equity is equal to a company’s assets minus its debt, ROE is considered the return on net assets.")
+st.markdown(round(df_ratios.loc[0,'returnOnEquity']*100,2))
 
-    st.markdown("**Return on Capital Employed**")
-    st.write("It is a financial ratio that measures a company's profitability and the efficiency with which its capital is used. In other words, the ratio measures how well a company is generating profits from its capital. ")
-    st.markdown(round(df_ratios.loc[0,'returnOnCapitalEmployed']*100,2))
+st.markdown("**Return on Capital Employed**")
+st.write("It is a financial ratio that measures a company's profitability and the efficiency with which its capital is used. In other words, the ratio measures how well a company is generating profits from its capital. ")
+st.markdown(round(df_ratios.loc[0,'returnOnCapitalEmployed']*100,2))
 
-    plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnAssets.values), marker='o',  label='Return on Assets', )
-    plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnEquity.values), marker='o', label='Return on Equity', )
-    plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnCapitalEmployed.values), marker='o', label='Return on Capital Employed', )
-    plt.legend(loc='upper left')
-    st.pyplot()
-except:
-    st.write("Profitability ratios data unavailable!")
+fig, ax = plt.subplots()
+plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnAssets.values), marker='o',  label='Return on Assets', )
+plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnEquity.values), marker='o', label='Return on Equity', )
+plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnCapitalEmployed.values), marker='o', label='Return on Capital Employed', )
+ax.xaxis.set_major_locator(years)
+ax.xaxis.set_major_formatter(years_fmt)
+plt.legend(loc='upper left')
+
+st.pyplot(fig)
+
+#except:
+#    st.write("Profitability ratios data unavailable!")
 
 #------------------------------------------------------------------------------#
 st.header('Performance Metrics')
@@ -165,23 +194,33 @@ try:
     taxes (EBIT) during a given period by the company's interest payments due within the same period.")
     st.markdown(round(df_metrics.loc[0,'interestCoverage'],2))
 
+    df_metrics['date'] = pd.to_datetime(df_metrics.date)
+
+    fig, ax = plt.subplots()
+
     plt.subplot(411)
-    plt.plot(list(df_metrics.date.values), list(df_metrics.revenuePerShare.values), marker='o',  label='Revenue per Share', )
+    plt.plot(list(df_metrics.date.dt.year), list(df_metrics.revenuePerShare.values), marker='o',  label='Revenue per Share', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
-    plt.legend(loc='upper left')
-    plt.subplot(412)
-    plt.plot(list(df_metrics.date.values), list(df_metrics.debtToEquity.values), marker='o',  label='Debt To Equity', )
-    plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
-    plt.legend(loc='upper left')
-    plt.subplot(413)
-    plt.plot(list(df_metrics.date.values), list(df_metrics.currentRatio.values), marker='o',  label='Current ratio', )
-    plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
-    plt.legend(loc='upper left')
-    plt.subplot(414)
-    plt.plot(list(df_metrics.date.values), list(df_metrics.interestCoverage.values), marker='o',  label='Interest Coverage', )
     plt.legend(loc='upper left')
 
-    st.pyplot()
+    plt.subplot(412)
+    plt.plot(list(df_metrics.date.dt.year), list(df_metrics.debtToEquity.values), marker='o',  label='Debt To Equity', )
+    plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
+    plt.legend(loc='upper left')
+
+
+    plt.subplot(413)
+    plt.plot(list(df_metrics.date.dt.year), list(df_metrics.currentRatio.values), marker='o',  label='Current ratio', )
+    plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
+    plt.legend(loc='upper left')
+
+    plt.subplot(414)
+    plt.plot(list(df_metrics.date.dt.year), list(df_metrics.interestCoverage.values), marker='o',  label='Interest Coverage', )
+    plt.legend(loc='upper left')
+    ax.minorticks_off()
+
+    st.pyplot(fig)
+
 except:
     st.write("Performance metrics data unavailable!")
 
@@ -226,7 +265,7 @@ try:
     products and services minus the costs to run it.")
     st.markdown(str(round(df_income.loc[0,'netIncome']/float(1e9),2)) + " billions")
 
-    years = df_income['date'].dt.year
+
     totals = [i+j+k+l+m+n for i,j,k,l,m,n in zip(df_income['costOfRevenue'],
                                                 df_income['operatingExpenses'],
                                                 df_income['interestExpense'],
@@ -243,16 +282,20 @@ try:
         other = [i / j * 100 for i,j in zip(df_income['otherExpenses'], totals)]
         net = [i / j * 100 for i,j in zip(df_income['netIncome'], totals)]
 
-        plt.bar(years, cost, edgecolor='white', label='Cost of Revenue')
-        plt.bar(years, operating, bottom=cost, edgecolor='white', label='Operating Expense')
-        plt.bar(years, interest, bottom=[i+j for i,j in zip(cost, operating)], edgecolor='white', label='Interest Expense')
-        plt.bar(years, tax, bottom=[i+j+k for i,j,k in zip(cost, operating,interest)], edgecolor='white', label='Tax Expense')
-        plt.bar(years, other, bottom=[i+j+k+l for i,j,k,l in zip(cost, operating,interest,tax)], edgecolor='white', label='Other Expenses')
-        plt.bar(years, net, bottom=[i+j+k+l+m for i,j,k,l,m in zip(cost, operating,interest,tax,other)], edgecolor='white', label='Net Income')
-        plt.xticks(np.arange(min(years), max(years)+1, 2))
+        fig, ax = plt.subplots()
+        plt.bar(df_income['date'].dt.year, cost, edgecolor='white', label='Cost of Revenue')
+        plt.bar(df_income['date'].dt.year, operating, bottom=cost, edgecolor='white', label='Operating Expense')
+        plt.bar(df_income['date'].dt.year, interest, bottom=[i+j for i,j in zip(cost, operating)], edgecolor='white', label='Interest Expense')
+        plt.bar(df_income['date'].dt.year, tax, bottom=[i+j+k for i,j,k in zip(cost, operating,interest)], edgecolor='white', label='Tax Expense')
+        plt.bar(df_income['date'].dt.year, other, bottom=[i+j+k+l for i,j,k,l in zip(cost, operating,interest,tax)], edgecolor='white', label='Other Expenses')
+        plt.bar(df_income['date'].dt.year, net, bottom=[i+j+k+l+m for i,j,k,l,m in zip(cost, operating,interest,tax,other)], edgecolor='white', label='Net Income')
+        plt.xticks(np.arange(min(df_income['date'].dt.year), max(df_income['date'].dt.year)+1, 2))
+
+        #ax.xaxis.set_major_locator(years)
+        #ax.xaxis.set_major_formatter(years_fmt)
 
         plt.legend(loc='upper left', prop=fontP)
-        st.pyplot()
+        st.pyplot(fig)
     except:
         st.dataframe(df_income)
 
@@ -271,6 +314,7 @@ try:
     st.write("It calculates a company’s earnings per share if all convertible securities were converted. Dilutive securities aren’t common stock, but instead securities that can be converted to common stock. Converting these securities decreases EPS, thus, diluted EPS tends to always be lower than EPS. Dilutive EPS is considered a conservative metric because it indicates a worst-case scenario in terms of EPS.")
     st.markdown(df_income.loc[0,'epsdiluted'])
 
+    fig, ax = plt.subplots()
     plt.subplot(211)
     plt.plot(list(df_income.date.values), list(df_income.eps.values), marker='o',  label='EPS', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
@@ -280,7 +324,12 @@ try:
     plt.plot(list(df_income.date.values), list(df_income.epsdiluted.values), marker='o',  label='EPS Diluted')
     plt.legend(loc='upper left')
 
-    st.pyplot()
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(years_fmt)
+
+
+    st.pyplot(fig)
+
 except:
     st.write("Income statement data unavailble!")
 
@@ -317,6 +366,7 @@ try:
     generated for each dollar of sale")
     st.markdown(str(round(df_ratios.loc[0, 'netProfitMargin']*100,2))+"%")
 
+    fig, ax = plt.subplots()
 
     plt.subplot(411)
     plt.plot(list(df_ratios.date.values), list(df_ratios.grossProfitMargin.values), marker='o',  label='Gross Margin', )
@@ -337,7 +387,10 @@ try:
     plt.plot(list(df_ratios.date.values), list(df_ratios.netProfitMargin.values), marker='o',  label='Profit Margin', )
     plt.legend(loc='upper left')
 
-    st.pyplot()
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(years_fmt)
+    ax.xaxis.set_minor_locator(months)
+    st.pyplot(fig)
 except:
     st.write("Margins data unavailble!")
 
@@ -345,8 +398,10 @@ except:
 #------------------------------------------------------------------------------#
 st.header('Cash Flow')
 
+
+st.markdown("**Operating Cashflow**")
+
 try:
-    st.markdown("**Operating Cashflow**")
     st.write("It is a measure of the amount of cash generated by a company's normal business operations. \
     Operating cash flow indicates whether a company can generate sufficient positive cash flow to maintain and grow its operations, otherwise, it may require external financing for capital expansion. \
     Operating cash flows concentrate on cash inflows and outflows related to a company's main business activities, such as selling and purchasing inventory, providing services, and paying salaries.")
@@ -367,21 +422,22 @@ try:
     Also, as interest rates rise, debt servicing costs rise as well. Conversely, if a company is repurchasing stock and issuing dividends while the company's earnings are underperforming, it may be a warning sign.")
     st.markdown(str(round(df_cashflow.loc[0,'netCashUsedProvidedByFinancingActivities']/float(1e9),2)) + " billions")
 
-
-    years = [d.year for d in date]
+    #years = df_cashflow['date'].dt.year
+    #years = [d.year for d in date]
     totals = [i+j+k for i,j,k in zip(df_cashflow['operatingCashFlow'],
                                      df_cashflow['netCashUsedForInvestingActivites'],
                                      df_cashflow['netCashUsedProvidedByFinancingActivities'])]
 
-
+    fig, ax = plt.subplots()
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.operatingCashFlow.values),label='Operating Cashflow', color='#5886a5', marker='o')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.netCashUsedForInvestingActivites.values), label='Investing Cashflow', color='#7aa6c2', marker='o')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.netCashUsedProvidedByFinancingActivities.values), label='Financing Cashflow', color='#c1e7ff', marker='o')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.netChangeInCash.values), label='Net Cashflow',linestyle='--', color='#004c6d', marker='o')
 
     plt.legend(loc='upper left', prop=fontP)
-
-    st.pyplot()
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(years_fmt)
+    st.pyplot(fig)
 
     st.markdown("**Free Cashflow**")
     st.write("It represents the cash a company generates after accounting for cash outflows to support operations and maintain its capital assets. \
@@ -389,9 +445,12 @@ try:
     and includes spending on equipment and assets as well as changes in working capital from the balance sheet.")
     st.markdown(str(round(df_cashflow.loc[0,'freeCashFlow']/float(1e9),2)) + " billions")
 
-
+    fig, ax = plt.subplots()
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.freeCashFlow.values),label='Free Cashflow', color='#5886a5', marker='o')
-    st.pyplot()
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(years_fmt)
+    st.pyplot(fig)
+
 except:
     st.write("Cashflow data unavailble!")
 
@@ -404,11 +463,13 @@ try:
     The time value of money assumes that a dollar today is worth more than a dollar tomorrow because it can be invested.")
     st.markdown(df_dcf.loc[0,'dcf'])
 
+    fig, ax = plt.subplots()
     plt.plot(list(df_dcf.date.values), list(df_dcf.dcf.values),label='Discounted Cashflow', color='#004c6d', marker='o')
     plt.plot(list(df_dcf.date.values), list(df_dcf.price.values),label='Price', color='#5886a5', linestyle='--')
     plt.legend(loc='upper left', prop=fontP)
-
-    st.pyplot()
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(years_fmt)
+    st.pyplot(fig)
 except:
     st.write("Cashflow data unavailble!")
 

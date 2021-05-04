@@ -1,0 +1,12 @@
+
+# ignore following files or folders
+.ipynb_checkpoints/
+obsolete/
+venv_pynance/
+*.json
+*.pyc
+*.csv
+*.db
+*.ipynb
+*.yml
+*.log
