@@ -1,4 +1,5 @@
 import os
+from os import environ
 import streamlit as st
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -32,7 +33,7 @@ st.title('Fundamentals')
 st.sidebar.title("Setup")
 api_key = st.sidebar.text_input('FMPCLOUD Key', '', type="password")
 
-if api_key != "":
+if environ.get('fmp_key') is not None:
     settings.set_apikey(os.environ['fmp_key'])
 else:
     settings.set_apikey(api_key)
