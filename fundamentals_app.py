@@ -33,11 +33,11 @@ st.sidebar.title("Setup")
 st.sidebar.write("Please get your FMP API key here [link](https://financialmodelingprep.com/developer)")
 api_key = st.sidebar.text_input('API Key', '', type="password")
 
-if environ.get('fmp_key') is not None:
-    settings.set_apikey(os.environ['fmp_key'])
-else:
+try:
+    if environ.get('fmp_key') is not None:
+        settings.set_apikey(os.environ['fmp_key'])
+except:
     settings.set_apikey(api_key)
-
 
 symbol_search = st.sidebar.text_input('Symbol', 'AMZN')
 #df_ticker = sts.ticker_search(match = symbol_search)
