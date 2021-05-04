@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -29,10 +30,10 @@ years_fmt = mdates.DateFormatter('%Y')
 st.title('Fundamentals')
 
 st.sidebar.title("Setup")
-api_key = st.sidebar.text_input('FMPCLOUD Key', 'test123', type="password")
+api_key = st.sidebar.text_input('FMPCLOUD Key', os.environ['fmp_key'], type="password")
 settings.set_apikey(api_key)
 
-symbol_search = st.sidebar.text_input('Symbol', '')
+symbol_search = st.sidebar.text_input('Symbol', 'AMZN')
 #df_ticker = sts.ticker_search(match = symbol_search)
 
 #scroll_list = list(df_ticker.name.values)
