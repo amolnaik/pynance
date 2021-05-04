@@ -29,7 +29,7 @@ years_fmt = mdates.DateFormatter('%Y')
 st.title('Fundamentals')
 
 st.sidebar.title("Setup")
-api_key = st.sidebar.text_input('FMPCLOUD Key', 'fb64cefc71056ea820f4572da33df319', type="password")
+api_key = st.sidebar.text_input('FMPCLOUD Key', 'test123', type="password")
 settings.set_apikey(api_key)
 
 symbol_search = st.sidebar.text_input('Symbol', '')
