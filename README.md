@@ -68,4 +68,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[product-screenshot]: screenshot.png
+[product-screenshot]: streamlit-fundamentals_app-2021-05-11-10-05-53.gif
