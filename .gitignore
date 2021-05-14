@@ -10,3 +10,4 @@ venv_pynance/
 *.ipynb
 *.yml
 *.log
+*.code

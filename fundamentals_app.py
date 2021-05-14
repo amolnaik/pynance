@@ -79,7 +79,8 @@ try:
 
     fig, ax = plt.subplots()
     ax.plot(list(df_prices.date.values), list(df_prices.close.values))
-
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     ax.xaxis.set_major_locator(years)
     ax.xaxis.set_major_formatter(years_fmt)
     st.pyplot(fig)
@@ -108,7 +109,8 @@ try:
     plt.plot(list(df_ratios.date.dt.year), list(df_ratios.priceToBookRatio.values), marker='o', label='P/B')
     plt.plot(list(df_ratios.date.dt.year), list(df_ratios.priceToSalesRatio.values), marker='o', label='P/S')
     plt.plot(list(df_ratios.date.dt.year), list(df_ratios.priceEarningsRatio.values), marker='o', label='P/E')
-
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     #ax.xaxis.set_major_locator(years)
     #ax.xaxis.set_major_formatter(years_fmt)
     plt.legend(loc='upper left')
@@ -140,6 +142,8 @@ try:
     plt.plot(list(df_ratios.date.values), list(df_ratios.netProfitMargin.values), marker='o', label='Net')
     ax.xaxis.set_major_locator(years)
     ax.xaxis.set_major_formatter(years_fmt)
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     plt.legend(loc='upper left')
     st.pyplot(fig)
 
@@ -161,6 +165,8 @@ try:
     plt.plot(list(df_ratios.date.values), list(df_ratios.returnOnCapitalEmployed.values), marker='o', label='Return on Capital Employed', )
     ax.xaxis.set_major_locator(years)
     ax.xaxis.set_major_formatter(years_fmt)
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     plt.legend(loc='upper left')
 
     st.pyplot(fig)
@@ -206,22 +212,30 @@ try:
     fig, ax = plt.subplots()
 
     plt.subplot(411)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_metrics.date.dt.year), list(df_metrics.revenuePerShare.values), marker='o',  label='Revenue per Share', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
     plt.subplot(412)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_metrics.date.dt.year), list(df_metrics.debtToEquity.values), marker='o',  label='Debt To Equity', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
 
     plt.subplot(413)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_metrics.date.dt.year), list(df_metrics.currentRatio.values), marker='o',  label='Current ratio', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
     plt.subplot(414)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_metrics.date.dt.year), list(df_metrics.interestCoverage.values), marker='o',  label='Interest Coverage', )
     plt.legend(loc='upper left')
     ax.minorticks_off()
@@ -322,12 +336,17 @@ try:
     st.markdown(df_income.loc[0,'epsdiluted'])
 
     fig, ax = plt.subplots()
+
     plt.subplot(211)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_income.date.values), list(df_income.eps.values), marker='o',  label='EPS', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
     plt.subplot(212)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_income.date.values), list(df_income.epsdiluted.values), marker='o',  label='EPS Diluted')
     plt.legend(loc='upper left')
 
@@ -376,21 +395,29 @@ try:
     fig, ax = plt.subplots()
 
     plt.subplot(411)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_ratios.date.values), list(df_ratios.grossProfitMargin.values), marker='o',  label='Gross Margin', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
     plt.subplot(412)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_ratios.date.values), list(df_ratios.operatingProfitMargin.values), marker='o',  label='EBITDA Margin', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
     plt.subplot(413)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_ratios.date.values), list(df_ratios.pretaxProfitMargin.values), marker='o',  label='EBIT Margin', )
     plt.tick_params(axis='x', which='both',bottom=False, top=False, labelbottom=False)
     plt.legend(loc='upper left')
 
     plt.subplot(414)
+    plt.grid(axis='x', color='0.95')
+    plt.grid(axis='y', color='0.95')
     plt.plot(list(df_ratios.date.values), list(df_ratios.netProfitMargin.values), marker='o',  label='Profit Margin', )
     plt.legend(loc='upper left')
 
@@ -436,6 +463,8 @@ try:
                                      df_cashflow['netCashUsedProvidedByFinancingActivities'])]
 
     fig, ax = plt.subplots()
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.operatingCashFlow.values),label='Operating Cashflow', color='#5886a5', marker='o')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.netCashUsedForInvestingActivites.values), label='Investing Cashflow', color='#7aa6c2', marker='o')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.netCashUsedProvidedByFinancingActivities.values), label='Financing Cashflow', color='#c1e7ff', marker='o')
@@ -453,6 +482,8 @@ try:
     st.markdown(str(round(df_cashflow.loc[0,'freeCashFlow']/float(1e9),2)) + " billions")
 
     fig, ax = plt.subplots()
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     plt.plot(list(df_cashflow.date.values), list(df_cashflow.freeCashFlow.values),label='Free Cashflow', color='#5886a5', marker='o')
     ax.xaxis.set_major_locator(years)
     ax.xaxis.set_major_formatter(years_fmt)
@@ -471,6 +502,8 @@ try:
     st.markdown(df_dcf.loc[0,'dcf'])
 
     fig, ax = plt.subplots()
+    ax.grid(axis='x', color='0.95')
+    ax.grid(axis='y', color='0.95')
     plt.plot(list(df_dcf.date.values), list(df_dcf.dcf.values),label='Discounted Cashflow', color='#004c6d', marker='o')
     plt.plot(list(df_dcf.date.values), list(df_dcf.price.values),label='Price', color='#5886a5', linestyle='--')
     plt.legend(loc='upper left', prop=fontP)
@@ -485,3 +518,4 @@ except:
 #------------------------------------------------------------------------------#
 st.subheader('References')
 st.markdown("Explanatory text from [Investopedia](https://www.investopedia.com/)")
+st.markdown("Github [Repo](https://github.com/amolnaik/pynance)")
